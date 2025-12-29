@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resident Portal Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="portal-body">
+
+<div class="portal-container">
+    <div class="portal-card">
+        <h2 id="title">Resident Portal</h2>
+        <p class="portal-subtext" id="subtitle">
+            Secure access to rent payments, maintenance requests, and account information.
+        </p>
+
+        <form class="portal-form" id="loginForm">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="resident@email.com" required>
+
+            <label id="passwordLabel">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+
+            <button type="submit" id="submitBtn">Login</button>
+
+            <div class="portal-links">
+                <a href="#" id="forgotLink">Forgot Password?</a>
+                <a href="#" id="registerLink">New Resident? Register</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+/* ===================== FULL RESIDENT PORTAL LOGIC ===================== */
+
+let mode = "login"; // login | register | reset
+let loginAttempts = 0;
+
+// Initialize localStorage users if not exists
+if (!localStorage.getItem("users")) {
+    const defaultUser = [{ email: "resident@email.com", password: "Resident@123", verified: true, approved: true }];
+    localStorage.setItem("users", JSON.stringify(defaultUser));
+}
+
+// Helpers
+function getUsers() { return JSON.parse(localStorage.getItem("users") || "[]"); }
+function saveUsers(users) { localStorage.setItem("users", JSON.stringify(users)); }
+
+// Password strength checker
+function isWeakPassword(password) {
+    if (password.length < 8) return "Password must be at least 8 characters.";
+    if (!/[A-Z]/.test(password)) return "Include an uppercase letter.";
+    if (!/[a-z]/.test(password)) return "Include a lowercase letter.";
+    if (!/[0-9]/.test(password)) return "Include a number.";
+    if (!/[^A-Za-z0-9]/.test(password)) return "Include a symbol.";
+    return null;
+}
+
+// Switch form mode
+function switchMode(newMode) {
+    mode = newMode;
+
+    const title = document.getElementById("title");
+    const subtitle = document.getElementById("subtitle");
+    const password = document.getElementById("password");
+    const passwordLabel = document.getElementById("passwordLabel");
+    const button = document.getElementById("submitBtn");
+
+    if (mode === "login") {
+        title.innerText = "Resident Portal";
+        subtitle.innerText = "Secure access to rent payments, maintenance requests, and account information.";
+        password.style.display = "block";
+        passwordLabel.style.display = "block";
+        password.required = true;
+        button.innerText = "Login";
+    }
+
+    if (mode === "register") {
+        title.innerText = "Resident Registration";
+        subtitle.innerText = "Create your resident portal account.";
+        password.style.display = "block";
+        passwordLabel.style.display = "block";
+        password.required = true;
+        button.innerText = "Register";
+    }
+
+    if (mode === "reset") {
+        title.innerText = "Reset Password";
+        subtitle.innerText = "Enter your email to reset your password.";
+        password.style.display = "none";
+        passwordLabel.style.display = "none";
+        password.required = false;
+        button.innerText = "Send Reset Link";
+    }
+}
+
+// PASSWORD VISIBILITY TOGGLE
+const passwordInput = document.getElementById("password");
+const toggleBtn = document.createElement("button");
+toggleBtn.type = "button";
+toggleBtn.innerText = "Show";
+toggleBtn.style.marginLeft = "10px";
+passwordInput.parentNode.appendChild(toggleBtn);
+
+toggleBtn.addEventListener("click", function () {
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleBtn.innerText = "Hide";
+    } else {
+        passwordInput.type = "password";
+        toggleBtn.innerText = "Show";
+    }
+});
+
+// Form submit
+document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    let users = getUsers();
+
+    // REGISTER
+    if (mode === "register") {
+        if (users.find(u => u.email === email)) {
+            alert("Account already exists.");
+            return;
+        }
+
+        const weak = isWeakPassword(password);
+        if (weak) {
+            alert(weak);
+            return;
+        }
+
+        // Add user as pending approval & unverified
+        users.push({ email, password, verified: false, approved: false });
+        saveUsers(users);
+
+        alert("Registration successful! Verification email sent (simulated). Await admin approval.");
+        switchMode("login");
+        return;
+    }
+
+    // RESET PASSWORD
+    if (mode === "reset") {
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            alert("Email not found.");
+            return;
+        }
+        alert("Password reset link sent (simulated).");
+        switchMode("login");
+        return;
+    }
+
+    // LOGIN
+    if (loginAttempts >= 5) {
+        alert("Too many failed attempts. Try again later.");
+        return;
+    }
+
+    const user = users.find(u => u.email === email && u.password === password);
+    if (!user) {
+        loginAttempts++;
+        alert("Invalid email or password.");
+        return;
+    }
+
+    if (!user.verified) {
+        alert("Email not verified. Please check your email (simulated).");
+        return;
+    }
+
+    if (!user.approved) {
+        alert("Account pending admin approval. Please wait for admin approval.");
+        return;
+    }
+
+    // Successful login
+    localStorage.setItem("residentSession", email);
+    alert("Login successful!");
+    window.location.href = "resident-dashboard.html";
+});
+
+// Link handlers
+document.getElementById("forgotLink").addEventListener("click", function (e) {
+    e.preventDefault();
+    switchMode("reset");
+});
+
+document.getElementById("registerLink").addEventListener("click", function (e) {
+    e.preventDefault();
+    switchMode("register");
+});
+</script>
+
+
+
+</body>
+</html>

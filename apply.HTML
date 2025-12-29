@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Apply Online</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                 <li><a href="index.html">Home</a></li>
+                <li><a href="floors.html">Floor Plans & Rates</a></li>
+                <li><a href="availability.html">Availability</a></li>
+                <li><a href="amenities.html">Amenities</a></li>
+                <li><a href="schedule.html">Schedule Tour</a></li>
+                <li><a href="apply.html">Apply Online</a></li>
+                <li><a href="resident.html">Resident Portal</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <h1>Apply Online</h1>
+        <p>Submit your rental application using this form. Replace the form action URL with your management system endpoint.</p>
+    </section>
+
+    <section id="application-form">
+        <form action="<!-- Add your form handler URL -->" method="POST">
+            <label for="full-name">Full Name</label>
+            <input type="text" id="full-name" name="full-name" placeholder="Enter your full name" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+
+            <label for="unit">Desired Unit</label>
+            <input type="text" id="unit" name="unit" placeholder="Unit Number or Type" required>
+
+            <label for="message">Additional Information</label>
+            <textarea id="message" name="message" placeholder="Any special requests or notes" rows="4"></textarea>
+
+            <bu
